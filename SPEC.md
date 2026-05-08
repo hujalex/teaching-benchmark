@@ -10,13 +10,42 @@ Dataset
     - "test_question" - A test question intended to evaluate the student model's understanding
     - "test_answer" - The answer to the provided question under "test_question"
     - "required_information" - Any formulas, context, vocabulary that the teacher model must mention
+- Derived from lecture slides, textbook page, lecture transcript
+
+- No Labelled Data - Much more convenient for customers to immediately run evaluations, evaluation results from structure of the verifier rather than the training data itself
+
+- Confidence levels
+
+
+Algorithms
+- Knowledge Graph
+- Source fidelity
+- Readability
+- Information Density
+- Coherence
+
 
 
 Verifiers
 - Construct a Rubric Group consisting of two rubric types
     - Deterministic Rubric - Deterministically evaluate whether or not the model's output matches the ground truth. Furthermore perform an f1 analysis based on whether or not the teacher model mentions the required information
-    - Judging Rubric - leverage another smaller llm to simulate a student attempting the learn the given subject. Depending on the smaller models' understanding assign a reward to the model's current teaching capability
+    - F1 grading for consise/clarity
 
+    - Algorithms to deterministically evaluate teaching
+        - Ground truth knowledge graph
+            - Nodes: concepts, edges - prequisite relationships
+            - Order score - introducing concepts in chronological order
+            - Embedding similarity - how many sentences discuss the topic
+        - With detailed data labelling
+            - 1. Prerequisite order score
+            - 2. Concept Converge
+            - 3. Explanation depth per concept
+        - textstat for evaluating tone, grade_level, 
+
+    - Modes
+        - Text
+        - Image Generation
+            - Cosine Similarity
 
 System Prompt for smaller model: 
 You are a student struggling with [Topic]. Do not use outside knowledge. Only learn from what the teacher tells you."

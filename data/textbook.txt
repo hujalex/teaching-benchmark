@@ -1,0 +1,12 @@
+Discussion questions A It would have been difficult for Cavendish to start designing an
+
+experiment without at least some idea of the order of magnitude of G. How could he estimate it in advance to within a factor of 10?
+
+B Fill in the details of how one would determine Jupiter's mass by observing the acceleration of one of its moons. Why is it only necessary to know the acceleration of the moon, not the actual force acting on it? Why don’t we need to know the mass of the moon? What about a planet that has no moons, such as Venus — how could its mass be found?
+
+10.6 x Dark energy
+
+Until recently, physicists thought they understood gravity fairly well. Einstein had modified Newton’s theory, but certain characteristrics of gravitational forces were firmly established. For one thing, they were always attractive. If gravity always attracts, then it is logical to ask why the universe doesn’t collapse. Newton had answered this question by saying that if the universe was infinite in all directions, then it would have no geometric center toward which it would collapse; the forces on any particular star or planet exerted by distant parts of the universe would tend to cancel out by symmetry. More careful calculations, however, show that Newton’s universe would have a tendency to collapse on smaller scales: any part of the universe that happened to be slightly more dense than average would contract further, and this contraction would result in stronger gravitational forces, which would cause even more rapid contraction, and so on.
+
+When Einstein overhauled gravity, the same problem reared its ugly head. Like Newton, Einstein was predisposed to believe in a universe that was static, so he added a special repulsive term to his equations, intended to prevent a collapse. This term was not associated with any interaction of mass with mass, but represented merely an overall tendency for space itself to expand unless restrained by
+
