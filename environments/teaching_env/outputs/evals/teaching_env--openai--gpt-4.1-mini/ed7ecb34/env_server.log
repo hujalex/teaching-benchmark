@@ -1,0 +1,6 @@
+2026-05-07 19:11:43 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve teaching_env (env_args={}, extra_env_kwargs={'concurrency': 32}, num_workers=1)
+2026-05-07 19:11:43 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:54202
+2026-05-07 19:11:43 - verifiers.serve.server.env_router.EnvRouter - INFO - Started worker (id=0, name=teaching_env-0, address=ipc:///tmp/vf-0871a25c3246-teaching_env-0, pid=28151)
+2026-05-07 19:11:52 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-07 19:11:52 - verifiers.serve.server.env_router.EnvRouter - INFO - Router shut down
+2026-05-07 19:11:52 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer shut down

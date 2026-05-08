@@ -299,17 +299,9 @@ scripts/
 - `dependencies = ["verifiers>=0.1.8", "datasets", "math-verify", "openai"]`
 - `[tool.verifiers.eval] num_examples = 20, rollouts_per_example = 3`
 
----
+----
 
-## 9. Required environment variables
-
-- `OPENAI_API_KEY` (or override via `api_key_var`) — used by student simulator
-  and judge.
-- Optional: `STUDENT_BASE_URL`, `JUDGE_BASE_URL` for self-hosted endpoints.
-
----
-
-## 10. Validation plan
+## 9. Validation plan
 
 1. **Smoke test:** `prime eval run teaching-env -m gpt-4.1-mini -n 2 -r 1`.
 2. **Sanity test:** strong teacher → mean `learning_delta > 0` over 20 examples.

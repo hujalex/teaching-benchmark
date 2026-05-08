@@ -1,0 +1,9 @@
+2026-05-07 19:17:37 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-07 19:17:37 - verifiers.utils.env_utils - INFO - Using default args: max_turns=10, dataset_name='xw27/scibench', student_endpoint_id='gemini-2.5-flash', student_model=None, student_base_url=None, judge_endpoint_id='gemini-2.5-flash', seed=0, api_key_var='PRIME_API_KEY', judge_base_url=None, num_examples=50, judge_model=None
+2026-05-07 19:17:37 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-07 19:17:37 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-07 19:17:37 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-14eeb06a82f1-teaching_env-0
+2026-05-07 19:17:37 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-07 19:17:47 - verifiers.utils.message_utils - WARNING - env_response returned raw dicts/strings instead of vf.Messages. This repeatedly triggers normalize_messages(), causing unnecessary Pydantic validation overhead. Return vf.Message types (e.g. vf.UserMessage, vf.AssistantMessage) to avoid this.
+2026-05-07 19:21:57 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-07 19:21:58 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0

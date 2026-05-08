@@ -1,0 +1,55 @@
+2026-05-07 19:13:47 - verifiers.utils.env_utils - INFO - Loading environment: teaching-env
+2026-05-07 19:13:47 - verifiers.utils.env_utils - INFO - Using default args: student_model=None, judge_base_url=None, seed=0, max_turns=10, judge_model=None, num_examples=50, student_base_url=None, dataset_name='xw27/scibench', api_key_var='PRIME_API_KEY', judge_endpoint_id='trinity-mini', student_endpoint_id='trinity-mini'
+2026-05-07 19:13:47 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching-env'
+2026-05-07 19:13:47 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-07 19:13:47 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching-env-0 on ipc:///tmp/vf-4852b8bc7dd5-teaching-env-0
+2026-05-07 19:13:47 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching-env-0
+2026-05-07 19:13:57 - verifiers.serve.server.env_worker.EnvWorker - ERROR - Error processing request 15165390f8f54ccba06111a48c3bcc33: Error code: 404 - {'error': {'message': "The model 'arcee/trinity-mini' does not exist", 'type': 'server_error', 'param': None, 'code': 'model_not_found'}, 'request_id': '9f83eb10e9af7667-ORD', 'inference_id': 'req_a3f30ddc1ee3434bbfda24b4bcca73a1'}
+Traceback (most recent call last):
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/serve/server/env_worker.py", line 202, in process_request
+    response = await self.handle_run_group(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/serve/server/env_worker.py", line 154, in handle_run_group
+    outputs = await self.env.run_group(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/envs/environment.py", line 793, in run_group
+    group_states = await maybe_retry(run_group_attempt, max_retries=max_retries)()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/envs/environment.py", line 781, in run_group_attempt
+    group_states = await asyncio.gather(*rollout_tasks)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/envs/multiturn_env.py", line 162, in rollout
+    prompt_messages = await self.get_prompt_messages(state)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/verifiers/envs/multiturn_env.py", line 95, in get_prompt_messages
+    env_response = await self.env_response(messages, state)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/environments/teaching_env/teaching_env.py", line 223, in env_response
+    student_reply = await _call_student(
+                    ^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+    )
+    ^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/environments/teaching_env/teaching_env.py", line 55, in _call_student
+    response = await client.chat.completions.create(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<4 lines>...
+    )
+    ^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/openai/resources/chat/completions/completions.py", line 2739, in create
+    return await self._post(
+           ^^^^^^^^^^^^^^^^^
+    ...<53 lines>...
+    )
+    ^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1931, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/alexanderhu/projects/bounties/benchmarks/teaching-benchmark/.venv/lib/python3.14/site-packages/openai/_base_client.py", line 1716, in request
+    raise self._make_status_error_from_response(err.response) from None
+openai.NotFoundError: Error code: 404 - {'error': {'message': "The model 'arcee/trinity-mini' does not exist", 'type': 'server_error', 'param': None, 'code': 'model_not_found'}, 'request_id': '9f83eb10e9af7667-ORD', 'inference_id': 'req_a3f30ddc1ee3434bbfda24b4bcca73a1'}
+2026-05-07 19:13:57 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-07 19:13:58 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching-env-0
