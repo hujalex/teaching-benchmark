@@ -7,7 +7,6 @@ class TeachingEnv(vf.MultiTurnEnv):
     async def env_response(self, messages: vf.Messages, state: vf.State) -> vf.Message:
         parsed = self.parser.parse(messages)
         action = parsed.action
-        feedback = process_action(action)
 
 async def evaluate_content(response, ground_truth):
     pass
