@@ -1,0 +1,24 @@
+2026-05-08 18:36:08 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve teaching_env (env_args={}, extra_env_kwargs={'concurrency': 32}, num_workers=1)
+2026-05-08 18:36:08 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:53980
+2026-05-08 18:36:08 - verifiers.serve.server.env_router.EnvRouter - INFO - Started worker (id=0, name=teaching_env-0, address=ipc:///tmp/vf-41c58413f37c-teaching_env-0, pid=61552)
+2026-05-08 18:36:19 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: ?)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=100)
+  W0     | no stats yet
+2026-05-08 18:36:29 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=199)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=2ms max=23ms (n=98)
+2026-05-08 18:36:39 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=298)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=23ms (n=197)
+2026-05-08 18:36:49 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=397)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=23ms (n=296)
+2026-05-08 18:36:59 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=46ms max=161ms (n=490)
+  W0     | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=32ms max=140ms (n=390)
+2026-05-08 18:37:09 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=33ms max=161ms (n=591)
+  W0     | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=31ms max=140ms (n=489)
+2026-05-08 18:37:14 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-08 18:37:14 - verifiers.serve.server.env_router.EnvRouter - INFO - Router shut down
+2026-05-08 18:37:14 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer shut down

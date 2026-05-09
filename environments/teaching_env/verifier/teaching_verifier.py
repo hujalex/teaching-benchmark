@@ -8,7 +8,7 @@ import spacy
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from datasets import load_dataset
 
-from .base import BaseVerifier
+from .base import BaseVerifier, clean_source
 from . import (
     concept_coverage,
     sentence_coverage,
@@ -28,8 +28,8 @@ class TeachingVerifier(BaseVerifier):
         "contradiction":       0.20,
         "entailment_chain":    0.18,
         "order":               0.10,
-        "example_grounding":   0.09,
-        "information_density": 0.02,
+        "example_grounding":   0.01,
+        "information_density": 0.10,
         "readability_curve":   0.01,
     }
 
@@ -51,7 +51,7 @@ class TeachingVerifier(BaseVerifier):
         kg = metadata.get("kg") or self.kg_index.get(
             topic, {"concepts": [], "prerequisite_edges": []}
         )
-        source_text = prompt
+        source_text = clean_source(prompt)
 
         src_sents = nltk.sent_tokenize(source_text)
         comp_sents = nltk.sent_tokenize(completion)

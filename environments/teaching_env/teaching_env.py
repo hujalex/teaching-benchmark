@@ -50,8 +50,10 @@ def load_environment(**_kwargs) -> vf.Environment:
     for key in TeachingVerifier.WEIGHTS:
         rubric.add_metric(_make_metric(key))
 
+
     return vf.SingleTurnEnv(
         dataset=dataset,
         system_prompt=SYSTEM_PROMPT,
         rubric=rubric,
+        pass_threshold=0.75,
     )

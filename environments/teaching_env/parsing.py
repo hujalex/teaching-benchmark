@@ -7,6 +7,7 @@ from datasets import Dataset, Features, Sequence, Value
 import frontmatter
 from markdown_it import MarkdownIt
 from keybert import KeyBERT
+from verifier.base import clean_source
 
 
 md_parser = MarkdownIt()
@@ -78,9 +79,9 @@ def build_kg(raw_text: str, top_n: int = 12) -> dict:
     return {"concepts": concepts, "prerequisite_edges": edges}
 
 
-def convert_math_textbook_page_to_markdown(
-    source_pdf: str | Path = "data/pdf/Math-textbook-page.pdf",
-    output_markdown: str | Path = "data/markdown/Math-textbook-page.md",
+def convert_pdf_to_markdown(
+    source_pdf: str | Path,
+    output_markdown: str | Path,
 ) -> Path:
     source_path = Path(source_pdf)
     output_path = Path(output_markdown)
@@ -141,111 +142,112 @@ def parse_markdown(filepath: Path) -> dict:
 
 
 def create_dataset(
-    pdf_dir: str = "data/pdf",
-    markdown_dir: str = "data/markdown",
+    pdf_dir: str | Path | None = None,
+    markdown_dir: str | Path | None = None,
 ) -> Dataset:
-    pdf_path = Path(pdf_dir)
-    md_path = Path(markdown_dir)
-    if not pdf_path.exists():
-        return Dataset.from_list(
-            [
-                {
-                    "topic": "newton_second_law",
-                    "source": "fallback",
-                    "page_number": 1,
-                    "subject": "physics",
-                    "source_file": "fallback",
-                    "raw_text": "Newton's second law connects force, mass, and acceleration.",
-                    "headers": ["Newton's second law"],
-                    "sections": ["Force is proportional to acceleration and scales with mass."],
-                    "num_sections": 1,
-                    "question": "Explain Newton's second law to a beginner.",
-                    "info": json.dumps(
-                        {
-                            "topic": "newton_second_law",
-                            "kg": {
-                                "concepts": [
-                                    {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-                                    {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-                                    {
-                                        "concept_id": "acceleration",
-                                        "canonical": "acceleration",
-                                        "surface_forms": ["acceleration", "a"],
-                                    },
-                                ],
-                                "prerequisite_edges": [
-                                    {
-                                        "concept": "force",
-                                        "prereq": "mass",
-                                        "confidence": "high",
-                                        "signal": "fallback",
-                                    },
-                                    {
-                                        "concept": "force",
-                                        "prereq": "acceleration",
-                                        "confidence": "high",
-                                        "signal": "fallback",
-                                    },
-                                ],
-                            },
-                        }
-                    ),
-                }
-            ]
-        )
+    _here = Path(__file__).parent
+    pdf_path = Path(pdf_dir) if pdf_dir else _here / "data" / "pdf"
+    md_path = Path(markdown_dir) if markdown_dir else _here / "data" / "markdown"
+    # if not pdf_path.exists():
+    #     return Dataset.from_list(
+    #         [
+    #             {
+    #                 "topic": "newton_second_law",
+    #                 "source": "fallback",
+    #                 "page_number": 1,
+    #                 "subject": "physics",
+    #                 "source_file": "fallback",
+    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
+    #                 "headers": ["Newton's second law"],
+    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
+    #                 "num_sections": 1,
+    #                 "question": "Explain Newton's second law to a beginner.",
+    #                 "info": json.dumps(
+    #                     {
+    #                         "topic": "newton_second_law",
+    #                         "kg": {
+    #                             "concepts": [
+    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
+    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
+    #                                 {
+    #                                     "concept_id": "acceleration",
+    #                                     "canonical": "acceleration",
+    #                                     "surface_forms": ["acceleration", "a"],
+    #                                 },
+    #                             ],
+    #                             "prerequisite_edges": [
+    #                                 {
+    #                                     "concept": "force",
+    #                                     "prereq": "mass",
+    #                                     "confidence": "high",
+    #                                     "signal": "fallback",
+    #                                 },
+    #                                 {
+    #                                     "concept": "force",
+    #                                     "prereq": "acceleration",
+    #                                     "confidence": "high",
+    #                                     "signal": "fallback",
+    #                                 },
+    #                             ],
+    #                         },
+    #                     }
+    #                 ),
+    #             }
+    #         ]
+    #     )
 
     pdf_files = sorted(pdf_path.glob("*.pdf"))
-    if not pdf_files:
-        return Dataset.from_list(
-            [
-                {
-                    "topic": "newton_second_law",
-                    "source": "fallback",
-                    "page_number": 1,
-                    "subject": "physics",
-                    "source_file": "fallback",
-                    "raw_text": "Newton's second law connects force, mass, and acceleration.",
-                    "headers": ["Newton's second law"],
-                    "sections": ["Force is proportional to acceleration and scales with mass."],
-                    "num_sections": 1,
-                    "question": "Explain Newton's second law to a beginner.",
-                    "info": json.dumps(
-                        {
-                            "topic": "newton_second_law",
-                            "kg": {
-                                "concepts": [
-                                    {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-                                    {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-                                    {
-                                        "concept_id": "acceleration",
-                                        "canonical": "acceleration",
-                                        "surface_forms": ["acceleration", "a"],
-                                    },
-                                ],
-                                "prerequisite_edges": [
-                                    {
-                                        "concept": "force",
-                                        "prereq": "mass",
-                                        "confidence": "high",
-                                        "signal": "fallback",
-                                    },
-                                    {
-                                        "concept": "force",
-                                        "prereq": "acceleration",
-                                        "confidence": "high",
-                                        "signal": "fallback",
-                                    },
-                                ],
-                            },
-                        }
-                    ),
-                }
-            ]
-        )
+    # if not pdf_files:
+    #     return Dataset.from_list(
+    #         [
+    #             {
+    #                 "topic": "newton_second_law",
+    #                 "source": "fallback",
+    #                 "page_number": 1,
+    #                 "subject": "physics",
+    #                 "source_file": "fallback",
+    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
+    #                 "headers": ["Newton's second law"],
+    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
+    #                 "num_sections": 1,
+    #                 "question": "Explain Newton's second law to a beginner.",
+    #                 "info": json.dumps(
+    #                     {
+    #                         "topic": "newton_second_law",
+    #                         "kg": {
+    #                             "concepts": [
+    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
+    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
+    #                                 {
+    #                                     "concept_id": "acceleration",
+    #                                     "canonical": "acceleration",
+    #                                     "surface_forms": ["acceleration", "a"],
+    #                                 },
+    #                             ],
+    #                             "prerequisite_edges": [
+    #                                 {
+    #                                     "concept": "force",
+    #                                     "prereq": "mass",
+    #                                     "confidence": "high",
+    #                                     "signal": "fallback",
+    #                                 },
+    #                                 {
+    #                                     "concept": "force",
+    #                                     "prereq": "acceleration",
+    #                                     "confidence": "high",
+    #                                     "signal": "fallback",
+    #                                 },
+    #                             ],
+    #                         },
+    #                     }
+    #                 ),
+    #             }
+    #         ]
+    #     )
 
     for pdf_file in pdf_files:
         output_md = md_path / f"{pdf_file.stem}.md"
-        convert_math_textbook_page_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
+        convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
 
     files = sorted(md_path.glob("*.md"))
     if not files:
@@ -254,11 +256,12 @@ def create_dataset(
     records = []
     for f in files:
         page = parse_markdown(f)
-        kg = build_kg(page["raw_text"])
+        cleaned_text = clean_source(page["raw_text"])
+        kg = build_kg(cleaned_text)
         records.append({
             **page,
-            # verifiers-framework columns
-            "question": page["raw_text"],
+            # verifiers-framework columns — use cleaned text so metrics see no PDF artifacts
+            "question": cleaned_text,
             "info": json.dumps({"topic": page["topic"], "kg": kg}),
         })
 

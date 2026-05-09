@@ -1,0 +1,22 @@
+2026-05-08 19:35:51 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-08 19:36:01 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-08 19:36:01 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-08 19:36:01 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-68b6fad91fd1-teaching_env-0
+2026-05-08 19:36:01 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-08 19:36:02 - verifiers.envs.environment.SingleTurnEnv - ERROR - Aborted rollout due to ModelError() -> NotFoundError("Error code: 404 - {'error': {'message': 'Provider returned error', 'type': 'server_error', 'param': None, 'code': 'not_found', 'metadata': {'raw': '', 'is_byok': False}}, 'request_id': '9f8c48c69987e8ea-ORD', 'inference_id': 'req_378908b4e4f34f34929614fac8c0a6cd'}")
+2026-05-08 19:36:22 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-08 19:36:33 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-08 19:36:33 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-08 19:36:33 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-68b6fad91fd1-teaching_env-0
+2026-05-08 19:36:33 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-08 19:38:19 - verifiers.serve.server.env_worker.EnvWorker - INFO - Cancelling 2 active tasks on worker teaching_env-0
+2026-05-08 19:38:19 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0
+2026-05-08 19:38:21 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-08 19:38:36 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-08 19:38:36 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-08 19:38:36 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-68b6fad91fd1-teaching_env-0
+2026-05-08 19:38:36 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-08 19:38:37 - verifiers.envs.environment.SingleTurnEnv - ERROR - Aborted rollout due to ModelError() -> NotFoundError("Error code: 404 - {'error': {'message': 'Provider returned error', 'type': 'server_error', 'param': None, 'code': 'not_found', 'metadata': {'raw': '', 'is_byok': False}}, 'request_id': '9f8c4c8c3b1cdacc-ORD', 'inference_id': 'req_642210ff9ed34c388b0d8a8f9c93508d'}")
+2026-05-08 19:39:11 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: list index out of range
+2026-05-08 19:40:13 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-08 19:40:13 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0
