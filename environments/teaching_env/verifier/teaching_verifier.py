@@ -18,21 +18,28 @@ from . import (
     example_grounding,
     information_density,
     readability_curve,
+    originality,
 )
 
 
 class TeachingVerifier(BaseVerifier):
     WEIGHTS = {
         "concept_coverage":    0.20,
-        "sentence_coverage":   0.20,
+        "sentence_coverage":   0.18,
         "contradiction":       0.20,
-        "entailment_chain":    0.18,
+        "entailment_chain":    0.16,
         "order":               0.10,
         "example_grounding":   0.01,
-        "information_density": 0.10,
+        "information_density": 0.09,
         "readability_curve":   0.01,
+        "originality":         0.05,
     }
 
+    # Originality weight scale (for reference):
+    #   math/chemistry/physics  0.02–0.03  — fixed notation, unavoidable term reuse
+    #   biology/CS              0.04–0.05  — moderate vocabulary flexibility
+    #   business                0.07       — many equivalent phrasings available
+    #   humanities              0.10       — narrative language is highly paraphrasable
     SUBJECT_WEIGHTS: dict[str, dict[str, float]] = {
         "math": {
             "concept_coverage":    0.22,
@@ -41,68 +48,75 @@ class TeachingVerifier(BaseVerifier):
             "entailment_chain":    0.20,
             "order":               0.12,
             "example_grounding":   0.03,
-            "information_density": 0.05,
+            "information_density": 0.03,
             "readability_curve":   0.01,
+            "originality":         0.02,
         },
         "chemistry": {
             "concept_coverage":    0.22,
             "sentence_coverage":   0.18,
             "contradiction":       0.22,
             "entailment_chain":    0.18,
-            "order":               0.12,
+            "order":               0.11,
             "example_grounding":   0.03,
-            "information_density": 0.04,
+            "information_density": 0.02,
             "readability_curve":   0.01,
+            "originality":         0.03,
         },
         "physics": {
             "concept_coverage":    0.22,
             "sentence_coverage":   0.16,
             "contradiction":       0.22,
-            "entailment_chain":    0.20,
-            "order":               0.12,
+            "entailment_chain":    0.19,
+            "order":               0.11,
             "example_grounding":   0.04,
-            "information_density": 0.03,
+            "information_density": 0.02,
             "readability_curve":   0.01,
+            "originality":         0.03,
         },
         "biology": {
             "concept_coverage":    0.22,
             "sentence_coverage":   0.20,
-            "contradiction":       0.18,
+            "contradiction":       0.16,
             "entailment_chain":    0.14,
             "order":               0.10,
-            "example_grounding":   0.08,
+            "example_grounding":   0.06,
             "information_density": 0.06,
             "readability_curve":   0.02,
+            "originality":         0.04,
         },
         "computer_science": {
             "concept_coverage":    0.20,
             "sentence_coverage":   0.15,
             "contradiction":       0.20,
-            "entailment_chain":    0.18,
+            "entailment_chain":    0.16,
             "order":               0.12,
-            "example_grounding":   0.08,
-            "information_density": 0.05,
-            "readability_curve":   0.02,
+            "example_grounding":   0.07,
+            "information_density": 0.04,
+            "readability_curve":   0.01,
+            "originality":         0.05,
         },
         "business": {
-            "concept_coverage":    0.18,
-            "sentence_coverage":   0.18,
-            "contradiction":       0.16,
-            "entailment_chain":    0.14,
+            "concept_coverage":    0.16,
+            "sentence_coverage":   0.16,
+            "contradiction":       0.15,
+            "entailment_chain":    0.13,
             "order":               0.10,
-            "example_grounding":   0.10,
+            "example_grounding":   0.09,
             "information_density": 0.08,
             "readability_curve":   0.06,
+            "originality":         0.07,
         },
         "humanities": {
-            "concept_coverage":    0.14,
-            "sentence_coverage":   0.22,
+            "concept_coverage":    0.12,
+            "sentence_coverage":   0.20,
             "contradiction":       0.12,
             "entailment_chain":    0.10,
             "order":               0.06,
             "example_grounding":   0.14,
             "information_density": 0.06,
-            "readability_curve":   0.16,
+            "readability_curve":   0.10,
+            "originality":         0.10,
         },
     }
 
@@ -148,6 +162,7 @@ class TeachingVerifier(BaseVerifier):
             "example_grounding":   self._example_grounding(completion),
             "information_density": self._information_density(completion),
             "readability_curve":   self._readability_curve(completion),
+            "originality":         self._originality(source_text, completion),
         }
 
         scores["composite"] = sum(scores[k] * weights[k] for k in weights)
@@ -198,6 +213,11 @@ class TeachingVerifier(BaseVerifier):
     def _readability_curve(self, completion: str) -> float:
         score = readability_curve.compute(completion)
         self._log("readability_curve", score)
+        return score
+
+    def _originality(self, source_text: str, completion: str) -> float:
+        score = originality.compute(source_text, completion)
+        self._log("originality", score)
         return score
 
 

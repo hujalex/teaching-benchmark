@@ -12,6 +12,7 @@ source indicates shallow regurgitation, not genuine understanding.
 ## Why ROUGE?
 
 ROUGE (Recall-Oriented Understudy for Gisting Evaluation) measures n-gram
+
 overlap between two texts. Here we invert it: **high ROUGE = low originality**.
 
 | ROUGE variant | What it captures |

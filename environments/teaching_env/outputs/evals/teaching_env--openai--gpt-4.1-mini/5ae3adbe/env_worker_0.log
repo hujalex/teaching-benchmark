@@ -1,0 +1,27 @@
+2026-05-09 18:34:13 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 18:34:24 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 18:34:24 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 18:34:24 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-a1c09bac633e-teaching_env-0
+2026-05-09 18:34:24 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 18:43:41 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 18:43:57 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 18:43:57 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 18:43:57 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-a1c09bac633e-teaching_env-0
+2026-05-09 18:43:57 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 18:54:38 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: MPS backend out of memory (MPS allocated: 14.27 GiB, other allocations: 3.75 GiB, max allowed: 18.13 GiB). Tried to allocate 315.38 MiB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure).
+2026-05-09 18:54:39 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: MPS backend out of memory (MPS allocated: 14.27 GiB, other allocations: 3.75 GiB, max allowed: 18.13 GiB). Tried to allocate 320.84 MiB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure).
+2026-05-09 18:54:42 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 18:54:56 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 18:54:56 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 18:54:56 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-a1c09bac633e-teaching_env-0
+2026-05-09 18:54:56 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 18:57:39 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 18:57:53 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 18:57:53 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 18:57:53 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-a1c09bac633e-teaching_env-0
+2026-05-09 18:57:53 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 19:03:50 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: MPS backend out of memory (MPS allocated: 12.46 GiB, other allocations: 5.66 GiB, max allowed: 18.13 GiB). Tried to allocate 73.88 MiB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure).
+2026-05-09 19:03:50 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: MPS backend out of memory (MPS allocated: 12.46 GiB, other allocations: 5.66 GiB, max allowed: 18.13 GiB). Tried to allocate 384.00 MiB on private pool. Use PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 to disable upper limit for memory allocations (may cause system failure).
+2026-05-09 19:14:49 - verifiers.serve.server.env_worker.EnvWorker - INFO - Cancelling 6 active tasks on worker teaching_env-0
+2026-05-09 19:14:49 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-09 19:14:49 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0

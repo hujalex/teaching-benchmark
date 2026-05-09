@@ -19,6 +19,7 @@ dependencies = [
     "markitdown[pdf]",
     "python-frontmatter",
     "markdown-it-py",
+    "rouge-score>=0.1.2",
 ]
 
 [build-system]
