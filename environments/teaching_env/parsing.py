@@ -141,6 +141,11 @@ def parse_markdown(filepath: Path) -> dict:
     }
 
 
+def _subject_label(folder_name: str) -> str:
+    """Normalise a folder name to a subject label (hyphens → underscores)."""
+    return folder_name.replace("-", "_")
+
+
 def create_dataset(
     pdf_dir: str | Path | None = None,
     markdown_dir: str | Path | None = None,
@@ -148,121 +153,48 @@ def create_dataset(
     _here = Path(__file__).parent
     pdf_path = Path(pdf_dir) if pdf_dir else _here / "data" / "pdf"
     md_path = Path(markdown_dir) if markdown_dir else _here / "data" / "markdown"
-    # if not pdf_path.exists():
-    #     return Dataset.from_list(
-    #         [
-    #             {
-    #                 "topic": "newton_second_law",
-    #                 "source": "fallback",
-    #                 "page_number": 1,
-    #                 "subject": "physics",
-    #                 "source_file": "fallback",
-    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
-    #                 "headers": ["Newton's second law"],
-    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
-    #                 "num_sections": 1,
-    #                 "question": "Explain Newton's second law to a beginner.",
-    #                 "info": json.dumps(
-    #                     {
-    #                         "topic": "newton_second_law",
-    #                         "kg": {
-    #                             "concepts": [
-    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-    #                                 {
-    #                                     "concept_id": "acceleration",
-    #                                     "canonical": "acceleration",
-    #                                     "surface_forms": ["acceleration", "a"],
-    #                                 },
-    #                             ],
-    #                             "prerequisite_edges": [
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "mass",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "acceleration",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                             ],
-    #                         },
-    #                     }
-    #                 ),
-    #             }
-    #         ]
-    #     )
 
-    pdf_files = sorted(pdf_path.glob("*.pdf"))
-    # if not pdf_files:
-    #     return Dataset.from_list(
-    #         [
-    #             {
-    #                 "topic": "newton_second_law",
-    #                 "source": "fallback",
-    #                 "page_number": 1,
-    #                 "subject": "physics",
-    #                 "source_file": "fallback",
-    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
-    #                 "headers": ["Newton's second law"],
-    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
-    #                 "num_sections": 1,
-    #                 "question": "Explain Newton's second law to a beginner.",
-    #                 "info": json.dumps(
-    #                     {
-    #                         "topic": "newton_second_law",
-    #                         "kg": {
-    #                             "concepts": [
-    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-    #                                 {
-    #                                     "concept_id": "acceleration",
-    #                                     "canonical": "acceleration",
-    #                                     "surface_forms": ["acceleration", "a"],
-    #                                 },
-    #                             ],
-    #                             "prerequisite_edges": [
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "mass",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "acceleration",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                             ],
-    #                         },
-    #                     }
-    #                 ),
-    #             }
-    #         ]
-    #     )
+    # Discover subject subdirectories; fall back to flat root layout.
+    subject_dirs = sorted(d for d in pdf_path.iterdir() if d.is_dir()) if pdf_path.exists() else []
 
-    for pdf_file in pdf_files:
-        output_md = md_path / f"{pdf_file.stem}.md"
-        convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
+    if subject_dirs:
+        # Subject-structured layout: pdf/<subject>/*.pdf → markdown/<subject>/*.md
+        for subject_dir in subject_dirs:
+            subject_md_path = md_path / subject_dir.name
+            for pdf_file in sorted(subject_dir.glob("*.pdf")):
+                output_md = subject_md_path / f"{pdf_file.stem}.md"
+                convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
 
-    files = sorted(md_path.glob("*.md"))
-    if not files:
-        raise ValueError(f"No markdown files found in {md_path}")
+        # Collect (markdown_path, folder_name) pairs from every subject subdir.
+        md_files: list[tuple[Path, str]] = []
+        for subject_dir in subject_dirs:
+            subject_md_path = md_path / subject_dir.name
+            md_files.extend(
+                (f, subject_dir.name) for f in sorted(subject_md_path.glob("*.md"))
+            )
+    else:
+        # Flat legacy layout: pdf/*.pdf → markdown/*.md
+        for pdf_file in sorted(pdf_path.glob("*.pdf")):
+            output_md = md_path / f"{pdf_file.stem}.md"
+            convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
+
+        md_files = [(f, "") for f in sorted(md_path.glob("*.md"))]
+
+    if not md_files:
+        raise ValueError(f"No markdown files found under {md_path}")
 
     records = []
-    for f in files:
+    for f, folder_name in md_files:
         page = parse_markdown(f)
+        # Folder name is the authoritative subject source; frontmatter is the fallback.
+        subject = _subject_label(folder_name) if folder_name else page.get("subject", "")
+        page["subject"] = subject
         cleaned_text = clean_source(page["raw_text"])
         kg = build_kg(cleaned_text)
         records.append({
             **page,
-            # verifiers-framework columns — use cleaned text so metrics see no PDF artifacts
             "question": cleaned_text,
-            "info": json.dumps({"topic": page["topic"], "kg": kg}),
+            "info": json.dumps({"topic": page["topic"], "subject": subject, "kg": kg}),
         })
 
     features = Features({

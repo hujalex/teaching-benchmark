@@ -30,7 +30,7 @@ def load_environment(**_kwargs) -> vf.Environment:
         response = completion[-1]["content"]
         if isinstance(info, str):
             info = json.loads(info)
-        metadata = {"topic": info["topic"], "kg": info["kg"]}
+        metadata = {"topic": info["topic"], "subject": info.get("subject", ""), "kg": info["kg"]}
         scores = await asyncio.to_thread(verifier.score_all, source_text, response, metadata)
         state["teaching_scores"] = scores
         return scores["composite"]

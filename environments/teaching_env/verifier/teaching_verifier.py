@@ -33,6 +33,79 @@ class TeachingVerifier(BaseVerifier):
         "readability_curve":   0.01,
     }
 
+    SUBJECT_WEIGHTS: dict[str, dict[str, float]] = {
+        "math": {
+            "concept_coverage":    0.22,
+            "sentence_coverage":   0.15,
+            "contradiction":       0.22,
+            "entailment_chain":    0.20,
+            "order":               0.12,
+            "example_grounding":   0.03,
+            "information_density": 0.05,
+            "readability_curve":   0.01,
+        },
+        "chemistry": {
+            "concept_coverage":    0.22,
+            "sentence_coverage":   0.18,
+            "contradiction":       0.22,
+            "entailment_chain":    0.18,
+            "order":               0.12,
+            "example_grounding":   0.03,
+            "information_density": 0.04,
+            "readability_curve":   0.01,
+        },
+        "physics": {
+            "concept_coverage":    0.22,
+            "sentence_coverage":   0.16,
+            "contradiction":       0.22,
+            "entailment_chain":    0.20,
+            "order":               0.12,
+            "example_grounding":   0.04,
+            "information_density": 0.03,
+            "readability_curve":   0.01,
+        },
+        "biology": {
+            "concept_coverage":    0.22,
+            "sentence_coverage":   0.20,
+            "contradiction":       0.18,
+            "entailment_chain":    0.14,
+            "order":               0.10,
+            "example_grounding":   0.08,
+            "information_density": 0.06,
+            "readability_curve":   0.02,
+        },
+        "computer_science": {
+            "concept_coverage":    0.20,
+            "sentence_coverage":   0.15,
+            "contradiction":       0.20,
+            "entailment_chain":    0.18,
+            "order":               0.12,
+            "example_grounding":   0.08,
+            "information_density": 0.05,
+            "readability_curve":   0.02,
+        },
+        "business": {
+            "concept_coverage":    0.18,
+            "sentence_coverage":   0.18,
+            "contradiction":       0.16,
+            "entailment_chain":    0.14,
+            "order":               0.10,
+            "example_grounding":   0.10,
+            "information_density": 0.08,
+            "readability_curve":   0.06,
+        },
+        "humanities": {
+            "concept_coverage":    0.14,
+            "sentence_coverage":   0.22,
+            "contradiction":       0.12,
+            "entailment_chain":    0.10,
+            "order":               0.06,
+            "example_grounding":   0.14,
+            "information_density": 0.06,
+            "readability_curve":   0.16,
+        },
+    }
+
     def __init__(self, kg_dataset_path: str | None = None):
         self._st_model = SentenceTransformer("all-MiniLM-L6-v2")
         self._nli_model = CrossEncoder("cross-encoder/nli-deberta-v3-small")
@@ -51,6 +124,7 @@ class TeachingVerifier(BaseVerifier):
         kg = metadata.get("kg") or self.kg_index.get(
             topic, {"concepts": [], "prerequisite_edges": []}
         )
+        weights = self.SUBJECT_WEIGHTS.get(metadata.get("subject", ""), self.WEIGHTS)
         source_text = clean_source(prompt)
 
         src_sents = nltk.sent_tokenize(source_text)
@@ -76,7 +150,7 @@ class TeachingVerifier(BaseVerifier):
             "readability_curve":   self._readability_curve(completion),
         }
 
-        scores["composite"] = sum(scores[k] * self.WEIGHTS[k] for k in self.WEIGHTS)
+        scores["composite"] = sum(scores[k] * weights[k] for k in weights)
         return scores
 
     def verify(self, prompt: str, completion: str, metadata: dict) -> float:
