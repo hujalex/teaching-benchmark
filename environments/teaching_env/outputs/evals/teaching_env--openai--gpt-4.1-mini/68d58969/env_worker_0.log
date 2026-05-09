@@ -1,0 +1,9 @@
+2026-05-08 19:24:25 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-08 19:24:34 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-08 19:24:34 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-08 19:24:34 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-0a2e8e8aebef-teaching_env-0
+2026-05-08 19:24:34 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-08 19:24:34 - verifiers.envs.environment.SingleTurnEnv - ERROR - Aborted rollout due to ModelError() -> NotFoundError("Error code: 404 - {'error': {'message': 'Provider returned error', 'type': 'server_error', 'param': None, 'code': 'not_found', 'metadata': {'raw': '', 'is_byok': False}}, 'request_id': '9f8c37fccab172e8-ORD', 'inference_id': 'req_0753bbb5bac3428091e4c6c6174d421b'}")
+2026-05-08 19:24:56 - verifiers.rubrics.rubric.Rubric - ERROR - Error calling reward function teaching_quality: list index out of range
+2026-05-08 19:26:08 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-08 19:26:08 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0
