@@ -72,6 +72,7 @@ def load_environment(**_kwargs) -> vf.Environment:
         "concept_coverage", "sentence_coverage", "contradiction",
         "entailment_chain", "order", "example_grounding",
         "information_density", "readability_curve", "originality",
+        "copy_rate",
     ]
 
     rubric = vf.Rubric(funcs=[teaching_quality], weights=[1.0])

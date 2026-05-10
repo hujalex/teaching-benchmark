@@ -7,7 +7,6 @@ requires-python = ">=3.10"
 dependencies = [
     "verifiers>=0.1.12",
     "fastembed",
-    "optimum[onnxruntime]",
     "scikit-learn",
     "spacy>=3.7.4",
     "nltk",
@@ -26,6 +25,12 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build]
 include = ["teaching_env.py", "parsing.py", "verifier/", "data/", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: requires model loading (fastembed + NLI ONNX, ~5 min on first run)",
+]
 
 [tool.verifiers.eval]
 num_examples = 5

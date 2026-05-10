@@ -1,0 +1,33 @@
+2026-05-10 03:12:26 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve teaching_env (env_args={}, extra_env_kwargs={'concurrency': 32}, num_workers=1)
+2026-05-10 03:12:26 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:55472
+2026-05-10 03:12:26 - verifiers.serve.server.env_router.EnvRouter - INFO - Started worker (id=0, name=teaching_env-0, address=ipc:///tmp/vf-137b775583ec-teaching_env-0, pid=69915)
+2026-05-10 03:12:36 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: ?)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=100)
+  W0     | no stats yet
+2026-05-10 03:12:46 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: 0)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=199)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=99)
+2026-05-10 03:12:57 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: 0)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=299)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=197)
+2026-05-10 03:13:07 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: 0)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=398)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=296)
+2026-05-10 03:13:17 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: 0)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=497)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=395)
+2026-05-10 03:13:27 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=597)
+  W0     | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=123ms (n=493)
+2026-05-10 03:13:37 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=696)
+  W0     | Lag: min=0ms mean=10ms median=1ms p90=1ms p99=1ms max=5s (n=579)
+2026-05-10 03:13:47 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=795)
+  W0     | Lag: min=0ms mean=8ms median=1ms p90=1ms p99=1ms max=5s (n=677)
+2026-05-10 03:13:57 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=2ms (n=895)
+  W0     | Lag: min=0ms mean=7ms median=1ms p90=1ms p99=1ms max=5s (n=776)
+2026-05-10 03:14:03 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-10 03:14:04 - verifiers.serve.server.env_router.EnvRouter - INFO - Router shut down
+2026-05-10 03:14:04 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer shut down

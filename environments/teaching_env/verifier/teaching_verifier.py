@@ -156,9 +156,16 @@ class TeachingVerifier(BaseVerifier):
         nli_src_x_comp = all_nli[:n3] if pairs_src_x_comp else np.empty((0, 3))
         nli_consecutive = all_nli[n3:] if pairs_consecutive else np.empty((0, 3))
 
+        # Shared similarity matrix — used by both sentence_coverage and copy detection.
+        sims = (
+            cosine_similarity(src_embs, comp_embs)
+            if src_embs.size > 0 and comp_embs.size > 0
+            else np.empty((0, 0))
+        )
+
         scores = {
             "concept_coverage":    self._concept_coverage(completion, kg),
-            "sentence_coverage":   self._sentence_coverage(src_embs, comp_embs),
+            "sentence_coverage":   self._sentence_coverage(sims),
             "contradiction":       self._contradiction(nli_src_x_comp, len(src_sents), len(comp_sents)),
             "entailment_chain":    self._entailment_chain(nli_consecutive),
             "order":               self._prerequisite_order(completion, kg),
@@ -166,9 +173,15 @@ class TeachingVerifier(BaseVerifier):
             "information_density": self._information_density(completion),
             "readability_curve":   self._readability_curve(completion),
             "originality":         self._originality(source_text, completion),
+            "copy_rate":           self._copy_rate(sims),
         }
 
-        scores["composite"] = sum(scores[k] * weights[k] for k in weights)
+        composite = sum(scores[k] * weights[k] for k in weights)
+
+        # Apply copy penalty: ramps from 0 at copy_rate=0.90 to 0.50 at copy_rate=1.0,
+        # halving the composite for a verbatim copy regardless of subject weights.
+        copy_penalty = max(0.0, (scores["copy_rate"] - 0.90) / 0.10)
+        scores["composite"] = composite * (1.0 - copy_penalty * 0.50)
         return scores
 
     def verify(self, prompt: str, completion: str, metadata: dict) -> float:
@@ -183,12 +196,24 @@ class TeachingVerifier(BaseVerifier):
         self._log("concept_coverage", score)
         return score
 
-    def _sentence_coverage(self, src_embs: np.ndarray, comp_embs: np.ndarray) -> float:
-        if src_embs.size == 0 or comp_embs.size == 0:
+    def _sentence_coverage(self, sims: np.ndarray) -> float:
+        if sims.size == 0:
             return 0.0
-        sims = cosine_similarity(src_embs, comp_embs)
         score = float(np.mean(sims.max(axis=1)))
         self._log("sentence_coverage", score)
+        return score
+
+    def _copy_rate(self, sims: np.ndarray) -> float:
+        """Per completion sentence: similarity to its nearest source sentence.
+
+        Mean across completion sentences.  Values near 1.0 indicate the
+        completion reproduces source sentences verbatim.  This reuses the
+        already-computed sims matrix at zero extra inference cost.
+        """
+        if sims.size == 0:
+            return 0.0
+        score = float(np.mean(sims.max(axis=0)))
+        self._log("copy_rate", score)
         return score
 
     def _contradiction(self, nli_outputs: np.ndarray, n_source: int, n_comp: int) -> float:

@@ -33,6 +33,26 @@ _PREREQ_PATTERNS: list[tuple[re.Pattern, str, bool]] = [
 ]
 
 
+_CONCEPT_NOISE = re.compile(r'[^a-zA-Z0-9\s\-]')   # non-word chars beyond hyphen
+_MIN_CONCEPT_SIM = 0.25    # drop keywords below this similarity to the document
+_MAX_CONCEPT_LEN = 40      # single-token concepts longer than this are PDF artifacts
+
+
+def _is_valid_concept(kw: str, score: float) -> bool:
+    """Return False for concepts that are likely PDF extraction noise."""
+    if score < _MIN_CONCEPT_SIM:
+        return False
+    tokens = kw.split()
+    for tok in tokens:
+        # Reject tokens that are pure digits or longer than the artifact threshold
+        if tok.isdigit() or len(tok) > _MAX_CONCEPT_LEN:
+            return False
+        # Reject tokens with non-alphanumeric characters beyond hyphens
+        if _CONCEPT_NOISE.search(tok):
+            return False
+    return True
+
+
 def build_kg(raw_text: str, top_n: int = 12, embedder=None) -> dict:
     """Extract a knowledge graph from raw markdown text."""
     from verifier.keyword_extractor import extract_keywords
@@ -42,7 +62,9 @@ def build_kg(raw_text: str, top_n: int = 12, embedder=None) -> dict:
     concepts = []
     cid_map: dict[str, str] = {}  # canonical_lower -> concept_id
 
-    for kw, _ in keywords:
+    for kw, score in keywords:
+        if not _is_valid_concept(kw, score):
+            continue
         cid = re.sub(r"\s+", "_", kw.strip().lower())
         words = kw.split()
         forms: set[str] = {kw, kw.lower()}
