@@ -1,5 +1,6 @@
 import asyncio
 import json
+import threading
 
 import verifiers as vf
 from parsing import create_dataset
@@ -15,8 +16,28 @@ SYSTEM_PROMPT = (
 
 
 def load_environment(**_kwargs) -> vf.Environment:
-    dataset = create_dataset()
-    verifier = TeachingVerifier()
+    # ------------------------------------------------------------------ #
+    # Lazy initialization — keep load_environment() near-zero cost so    #
+    # `prime env install` and import-time tests don't hang on model      #
+    # downloads or PDF processing. Verifier and dataset are constructed  #
+    # on first access (first rollout / first dataset read).              #
+    # ------------------------------------------------------------------ #
+    _verifier: TeachingVerifier | None = None
+    _verifier_lock = threading.Lock()
+
+    def _get_verifier() -> TeachingVerifier:
+        nonlocal _verifier
+        # Double-checked locking: fast path skips the lock once initialized,
+        # slow path serializes concurrent first-callers so model loads happen
+        # exactly once even under parallel rollouts.
+        if _verifier is None:
+            with _verifier_lock:
+                if _verifier is None:
+                    _verifier = TeachingVerifier()
+        return _verifier
+
+    def dataset_builder():
+        return create_dataset(st_model=_get_verifier()._st_model)
 
     # ------------------------------------------------------------------ #
     # Primary reward — runs score_all() once and caches sub-scores in    #
@@ -31,6 +52,7 @@ def load_environment(**_kwargs) -> vf.Environment:
         if isinstance(info, str):
             info = json.loads(info)
         metadata = {"topic": info["topic"], "subject": info.get("subject", ""), "kg": info["kg"]}
+        verifier = _get_verifier()
         scores = await asyncio.to_thread(verifier.score_all, source_text, response, metadata)
         state["teaching_scores"] = scores
         return scores["composite"]
@@ -52,7 +74,7 @@ def load_environment(**_kwargs) -> vf.Environment:
 
 
     return vf.SingleTurnEnv(
-        dataset=dataset,
+        dataset=dataset_builder,
         system_prompt=SYSTEM_PROMPT,
         rubric=rubric,
         pass_threshold=0.75,

@@ -15,10 +15,10 @@ md_parser = MarkdownIt()
 _kw_model: KeyBERT | None = None
 
 
-def _get_kw_model() -> KeyBERT:
+def _get_kw_model(st_model=None) -> KeyBERT:
     global _kw_model
     if _kw_model is None:
-        _kw_model = KeyBERT()
+        _kw_model = KeyBERT(model=st_model)
     return _kw_model
 
 
@@ -32,9 +32,9 @@ _PREREQ_PATTERNS: list[tuple[re.Pattern, str, bool]] = [
 ]
 
 
-def build_kg(raw_text: str, top_n: int = 12) -> dict:
+def build_kg(raw_text: str, top_n: int = 12, st_model=None) -> dict:
     """Extract a knowledge graph from raw markdown text using KeyBERT."""
-    model = _get_kw_model()
+    model = _get_kw_model(st_model)
     keywords = model.extract_keywords(
         raw_text,
         keyphrase_ngram_range=(1, 2),
@@ -149,6 +149,7 @@ def _subject_label(folder_name: str) -> str:
 def create_dataset(
     pdf_dir: str | Path | None = None,
     markdown_dir: str | Path | None = None,
+    st_model=None,
 ) -> Dataset:
     _here = Path(__file__).parent
     pdf_path = Path(pdf_dir) if pdf_dir else _here / "data" / "pdf"
@@ -190,7 +191,7 @@ def create_dataset(
         subject = _subject_label(folder_name) if folder_name else page.get("subject", "")
         page["subject"] = subject
         cleaned_text = clean_source(page["raw_text"])
-        kg = build_kg(cleaned_text)
+        kg = build_kg(cleaned_text, st_model=st_model)
         records.append({
             **page,
             "question": cleaned_text,

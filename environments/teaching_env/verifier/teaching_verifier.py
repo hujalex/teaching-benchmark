@@ -123,7 +123,12 @@ class TeachingVerifier(BaseVerifier):
     def __init__(self, kg_dataset_path: str | None = None):
         self._st_model = SentenceTransformer("all-MiniLM-L6-v2")
         self._nli_model = CrossEncoder("cross-encoder/nli-deberta-v3-small")
-        self._nlp = spacy.load("en_core_web_sm")
+        try:
+            self._nlp = spacy.load("en_core_web_sm")
+        except OSError:
+            from spacy.cli import download
+            download("en_core_web_sm")
+            self._nlp = spacy.load("en_core_web_sm")
         nltk.download("punkt", quiet=True)
         nltk.download("punkt_tab", quiet=True)
         self.kg_index: dict = {}
