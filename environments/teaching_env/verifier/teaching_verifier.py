@@ -19,100 +19,118 @@ from . import (
 
 
 class TeachingVerifier(BaseVerifier):
+    # Subject-agnostic fallback. Leans STEM-ish (high contradiction + concept
+    # coverage) but keeps every metric visible so a missing subject tag still
+    # produces a usable signal.
     WEIGHTS = {
         "concept_coverage":    0.20,
-        "sentence_coverage":   0.18,
-        "contradiction":       0.20,
+        "sentence_coverage":   0.17,
+        "contradiction":       0.18,
         "entailment_chain":    0.16,
-        "order":               0.10,
-        "example_grounding":   0.01,
-        "information_density": 0.09,
-        "readability_curve":   0.01,
-        "originality":         0.05,
+        "order":               0.12,
+        "example_grounding":   0.04,
+        "information_density": 0.05,
+        "readability_curve":   0.02,
+        "originality":         0.06,
     }
 
-    # Originality weight scale (for reference):
-    #   math/chemistry/physics  0.02–0.03  — fixed notation, unavoidable term reuse
-    #   biology/CS              0.04–0.05  — moderate vocabulary flexibility
-    #   business                0.07       — many equivalent phrasings available
-    #   humanities              0.10       — narrative language is highly paraphrasable
+    # Per-subject weights are tuned around two axes:
+    #   1. metric reliability for the subject (NLI is unreliable on humanities;
+    #      concept_coverage is unreliable when the KG is fuzzy);
+    #   2. what the subject actually rewards pedagogically (math = order +
+    #      logical chain; humanities = voice + readability; business = cases).
+    # Rule of thumb: do not put high weight on a metric that misfires for the
+    # subject — it amplifies noise where it matters most.
+    #
+    # Originality scale (for reference):
+    #   math                    0.02       — fixed notation, F=ma is F=ma
+    #   chemistry/physics       0.02–0.03  — formulae and units constrain phrasing
+    #   biology/CS              0.05       — moderate vocabulary flexibility
+    #   business                0.09       — many equivalent phrasings available
+    #   humanities              0.15       — voice is the discriminating signal
     SUBJECT_WEIGHTS: dict[str, dict[str, float]] = {
+      
         "math": {
-            "concept_coverage":    0.22,
-            "sentence_coverage":   0.15,
+            "concept_coverage":    0.20,
+            "sentence_coverage":   0.13,
             "contradiction":       0.22,
             "entailment_chain":    0.20,
-            "order":               0.12,
-            "example_grounding":   0.03,
+            "order":               0.15,
+            "example_grounding":   0.04,
             "information_density": 0.03,
             "readability_curve":   0.01,
             "originality":         0.02,
         },
+      
         "chemistry": {
-            "concept_coverage":    0.22,
-            "sentence_coverage":   0.18,
+            "concept_coverage":    0.20,
+            "sentence_coverage":   0.17,
             "contradiction":       0.22,
             "entailment_chain":    0.18,
-            "order":               0.11,
-            "example_grounding":   0.03,
-            "information_density": 0.02,
-            "readability_curve":   0.01,
-            "originality":         0.03,
-        },
-        "physics": {
-            "concept_coverage":    0.22,
-            "sentence_coverage":   0.16,
-            "contradiction":       0.22,
-            "entailment_chain":    0.19,
-            "order":               0.11,
+            "order":               0.13,
             "example_grounding":   0.04,
             "information_density": 0.02,
             "readability_curve":   0.01,
             "originality":         0.03,
         },
+      
+        "physics": {
+            "concept_coverage":    0.20,
+            "sentence_coverage":   0.14,
+            "contradiction":       0.22,
+            "entailment_chain":    0.20,
+            "order":               0.13,
+            "example_grounding":   0.06,
+            "information_density": 0.02,
+            "readability_curve":   0.01,
+            "originality":         0.02,
+        },
+     
         "biology": {
             "concept_coverage":    0.22,
             "sentence_coverage":   0.20,
-            "contradiction":       0.16,
-            "entailment_chain":    0.14,
-            "order":               0.10,
-            "example_grounding":   0.06,
-            "information_density": 0.06,
+            "contradiction":       0.14,
+            "entailment_chain":    0.13,
+            "order":               0.09,
+            "example_grounding":   0.08,
+            "information_density": 0.07,
             "readability_curve":   0.02,
-            "originality":         0.04,
-        },
-        "computer_science": {
-            "concept_coverage":    0.20,
-            "sentence_coverage":   0.15,
-            "contradiction":       0.20,
-            "entailment_chain":    0.16,
-            "order":               0.12,
-            "example_grounding":   0.07,
-            "information_density": 0.04,
-            "readability_curve":   0.01,
             "originality":         0.05,
         },
+    
+        "computer_science": {
+            "concept_coverage":    0.18,
+            "sentence_coverage":   0.14,
+            "contradiction":       0.18,
+            "entailment_chain":    0.18,
+            "order":               0.13,
+            "example_grounding":   0.08,
+            "information_density": 0.04,
+            "readability_curve":   0.02,
+            "originality":         0.05,
+        },
+     
         "business": {
-            "concept_coverage":    0.16,
+            "concept_coverage":    0.15,
             "sentence_coverage":   0.16,
-            "contradiction":       0.15,
-            "entailment_chain":    0.13,
-            "order":               0.10,
-            "example_grounding":   0.09,
+            "contradiction":       0.13,
+            "entailment_chain":    0.12,
+            "order":               0.08,
+            "example_grounding":   0.12,
             "information_density": 0.08,
-            "readability_curve":   0.06,
-            "originality":         0.07,
+            "readability_curve":   0.07,
+            "originality":         0.09,
         },
         "humanities": {
-            "concept_coverage":    0.12,
+            "concept_coverage":    0.13,
             "sentence_coverage":   0.20,
-            "contradiction":       0.12,
+            "contradiction":       0.10,
             "entailment_chain":    0.10,
-            "order":               0.06,
-            "example_grounding":   0.14,
-            "information_density": 0.06,
-            "readability_curve":   0.10,
-            "originality":         0.10,
+            "order":               0.05,
+            "example_grounding":   0.05,
+            "information_density": 0.07,
+            "readability_curve":   0.15,
+            "originality":         0.15,
         },
     }
 
