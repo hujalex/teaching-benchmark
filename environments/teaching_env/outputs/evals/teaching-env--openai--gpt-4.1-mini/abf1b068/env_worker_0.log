@@ -1,0 +1,7 @@
+2026-05-10 01:49:46 - verifiers.utils.env_utils - INFO - Loading environment: teaching-env
+2026-05-10 01:49:46 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching-env'
+2026-05-10 01:49:46 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-10 01:49:46 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching-env-0 on ipc:///tmp/vf-285a766a4fbd-teaching-env-0
+2026-05-10 01:49:46 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching-env-0
+2026-05-10 01:52:22 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-10 01:52:22 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching-env-0

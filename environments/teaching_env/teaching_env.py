@@ -3,8 +3,6 @@ import json
 import threading
 
 import verifiers as vf
-from parsing import create_dataset
-from verifier import TeachingVerifier
 
 
 SYSTEM_PROMPT = (
@@ -19,13 +17,13 @@ def load_environment(**_kwargs) -> vf.Environment:
     # ------------------------------------------------------------------ #
     # Lazy initialization — keep load_environment() near-zero cost so    #
     # `prime env install` and import-time tests don't hang on model      #
-    # downloads or PDF processing. Verifier and dataset are constructed  #
-    # on first access (first rollout / first dataset read).              #
+    # downloads or PDF processing. Heavy imports (fastembed, spacy) are  #
+    # deferred until first rollout.                                       #
     # ------------------------------------------------------------------ #
-    _verifier: TeachingVerifier | None = None
+    _verifier = None
     _verifier_lock = threading.Lock()
 
-    def _get_verifier() -> TeachingVerifier:
+    def _get_verifier():
         nonlocal _verifier
         # Double-checked locking: fast path skips the lock once initialized,
         # slow path serializes concurrent first-callers so model loads happen
@@ -33,11 +31,13 @@ def load_environment(**_kwargs) -> vf.Environment:
         if _verifier is None:
             with _verifier_lock:
                 if _verifier is None:
+                    from verifier.teaching_verifier import TeachingVerifier
                     _verifier = TeachingVerifier()
         return _verifier
 
     def dataset_builder():
-        return create_dataset(st_model=_get_verifier()._st_model)
+        from parsing import create_dataset
+        return create_dataset(embedder=_get_verifier()._embedder)
 
     # ------------------------------------------------------------------ #
     # Primary reward — runs score_all() once and caches sub-scores in    #
@@ -68,8 +68,14 @@ def load_environment(**_kwargs) -> vf.Environment:
         metric.__name__ = key
         return metric
 
+    _METRIC_KEYS = [
+        "concept_coverage", "sentence_coverage", "contradiction",
+        "entailment_chain", "order", "example_grounding",
+        "information_density", "readability_curve", "originality",
+    ]
+
     rubric = vf.Rubric(funcs=[teaching_quality], weights=[1.0])
-    for key in TeachingVerifier.WEIGHTS:
+    for key in _METRIC_KEYS:
         rubric.add_metric(_make_metric(key))
 
 

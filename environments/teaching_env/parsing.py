@@ -2,24 +2,25 @@ import json
 import re
 from pathlib import Path
 
-from markitdown import MarkItDown
 from datasets import Dataset, Features, Sequence, Value
 import frontmatter
 from markdown_it import MarkdownIt
-from keybert import KeyBERT
 from verifier.base import clean_source
 
 
 md_parser = MarkdownIt()
 
-_kw_model: KeyBERT | None = None
+_kw_embedder = None
 
 
-def _get_kw_model(st_model=None) -> KeyBERT:
-    global _kw_model
-    if _kw_model is None:
-        _kw_model = KeyBERT(model=st_model)
-    return _kw_model
+def _get_kw_embedder(embedder=None):
+    global _kw_embedder
+    if embedder is not None:
+        return embedder
+    if _kw_embedder is None:
+        from verifier.embedder import Embedder
+        _kw_embedder = Embedder()
+    return _kw_embedder
 
 
 # Patterns: (compiled regex, signal_name, swap_concept_prereq)
@@ -32,15 +33,11 @@ _PREREQ_PATTERNS: list[tuple[re.Pattern, str, bool]] = [
 ]
 
 
-def build_kg(raw_text: str, top_n: int = 12, st_model=None) -> dict:
-    """Extract a knowledge graph from raw markdown text using KeyBERT."""
-    model = _get_kw_model(st_model)
-    keywords = model.extract_keywords(
-        raw_text,
-        keyphrase_ngram_range=(1, 2),
-        stop_words="english",
-        top_n=top_n,
-    )
+def build_kg(raw_text: str, top_n: int = 12, embedder=None) -> dict:
+    """Extract a knowledge graph from raw markdown text."""
+    from verifier.keyword_extractor import extract_keywords
+    emb = _get_kw_embedder(embedder)
+    keywords = extract_keywords(raw_text, emb, top_n=top_n)
 
     concepts = []
     cid_map: dict[str, str] = {}  # canonical_lower -> concept_id
@@ -86,9 +83,13 @@ def convert_pdf_to_markdown(
     source_path = Path(source_pdf)
     output_path = Path(output_markdown)
 
+    if output_path.exists():
+        return output_path
+
     if not source_path.exists():
         raise FileNotFoundError(f"Source file not found: {source_path}")
 
+    from markitdown import MarkItDown
     converter = MarkItDown()
     conversion = converter.convert(str(source_path))
 
@@ -149,7 +150,7 @@ def _subject_label(folder_name: str) -> str:
 def create_dataset(
     pdf_dir: str | Path | None = None,
     markdown_dir: str | Path | None = None,
-    st_model=None,
+    embedder=None,
 ) -> Dataset:
     _here = Path(__file__).parent
     pdf_path = Path(pdf_dir) if pdf_dir else _here / "data" / "pdf"
@@ -191,7 +192,7 @@ def create_dataset(
         subject = _subject_label(folder_name) if folder_name else page.get("subject", "")
         page["subject"] = subject
         cleaned_text = clean_source(page["raw_text"])
-        kg = build_kg(cleaned_text, st_model=st_model)
+        kg = build_kg(cleaned_text, embedder=embedder)
         records.append({
             **page,
             "question": cleaned_text,

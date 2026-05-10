@@ -1,17 +1,13 @@
-# Required dependencies:
-# pip install spacy sentence-transformers keybert networkx nltk textstat datasets scikit-learn
-# python -m spacy download en_core_web_sm
-
-import numpy as np
 import nltk
+import numpy as np
 import spacy
-from sentence_transformers import SentenceTransformer, CrossEncoder
-from datasets import load_dataset
+from sklearn.metrics.pairwise import cosine_similarity
 
 from .base import BaseVerifier, clean_source
+from .embedder import Embedder
+from .nli_model import NLIModel
 from . import (
     concept_coverage,
-    sentence_coverage,
     contradiction_detection,
     entailment_chain,
     prerequisite_order,
@@ -120,9 +116,9 @@ class TeachingVerifier(BaseVerifier):
         },
     }
 
-    def __init__(self, kg_dataset_path: str | None = None):
-        self._st_model = SentenceTransformer("all-MiniLM-L6-v2")
-        self._nli_model = CrossEncoder("cross-encoder/nli-deberta-v3-small")
+    def __init__(self):
+        self._embedder = Embedder()
+        self._nli_model = NLIModel()
         try:
             self._nlp = spacy.load("en_core_web_sm")
         except OSError:
@@ -132,14 +128,10 @@ class TeachingVerifier(BaseVerifier):
         nltk.download("punkt", quiet=True)
         nltk.download("punkt_tab", quiet=True)
         self.kg_index: dict = {}
-        if kg_dataset_path:
-            ds = load_dataset(kg_dataset_path, split="train")
-            self.kg_index = {row["topic"]: row["kg"] for row in ds}
 
     def score_all(self, prompt: str, completion: str, metadata: dict) -> dict:
         """Run all metrics and return sub-scores plus a 'composite' key."""
         topic = metadata["topic"]
-        # Prefer KG injected directly (from info dict) over the index lookup
         kg = metadata.get("kg") or self.kg_index.get(
             topic, {"concepts": [], "prerequisite_edges": []}
         )
@@ -149,20 +141,26 @@ class TeachingVerifier(BaseVerifier):
         src_sents = nltk.sent_tokenize(source_text)
         comp_sents = nltk.sent_tokenize(completion)
 
-        pairs_3 = [(s, c) for s in src_sents for c in comp_sents]
-        pairs_4 = [(comp_sents[i], comp_sents[i + 1]) for i in range(len(comp_sents) - 1)]
+        # Embeddings computed once and shared across embedding-based metrics.
+        src_embs = self._embedder.encode(src_sents) if src_sents else np.empty((0, Embedder.DEFAULT_DIM))
+        comp_embs = self._embedder.encode(comp_sents) if comp_sents else np.empty((0, Embedder.DEFAULT_DIM))
 
-        all_pairs = pairs_3 + pairs_4
+        # Batch NLI inference for contradiction and entailment metrics.
+        pairs_src_x_comp = [(s, c) for s in src_sents for c in comp_sents]
+        pairs_consecutive = [(comp_sents[i], comp_sents[i + 1]) for i in range(len(comp_sents) - 1)]
+
+        all_pairs = pairs_src_x_comp + pairs_consecutive
         all_nli = self._nli_model.predict(all_pairs) if all_pairs else np.empty((0, 3))
 
-        nli_3 = all_nli[: len(pairs_3)] if pairs_3 else np.empty((0, 3))
-        nli_4 = all_nli[len(pairs_3) :] if pairs_4 else np.empty((0, 3))
+        n3 = len(pairs_src_x_comp)
+        nli_src_x_comp = all_nli[:n3] if pairs_src_x_comp else np.empty((0, 3))
+        nli_consecutive = all_nli[n3:] if pairs_consecutive else np.empty((0, 3))
 
         scores = {
             "concept_coverage":    self._concept_coverage(completion, kg),
-            "sentence_coverage":   self._sentence_coverage(source_text, completion),
-            "contradiction":       self._contradiction(nli_3, len(src_sents), len(comp_sents)),
-            "entailment_chain":    self._entailment_chain(nli_4),
+            "sentence_coverage":   self._sentence_coverage(src_embs, comp_embs),
+            "contradiction":       self._contradiction(nli_src_x_comp, len(src_sents), len(comp_sents)),
+            "entailment_chain":    self._entailment_chain(nli_consecutive),
             "order":               self._prerequisite_order(completion, kg),
             "example_grounding":   self._example_grounding(completion),
             "information_density": self._information_density(completion),
@@ -185,8 +183,11 @@ class TeachingVerifier(BaseVerifier):
         self._log("concept_coverage", score)
         return score
 
-    def _sentence_coverage(self, source_text: str, completion: str) -> float:
-        score = sentence_coverage.compute(source_text, completion, self._st_model)
+    def _sentence_coverage(self, src_embs: np.ndarray, comp_embs: np.ndarray) -> float:
+        if src_embs.size == 0 or comp_embs.size == 0:
+            return 0.0
+        sims = cosine_similarity(src_embs, comp_embs)
+        score = float(np.mean(sims.max(axis=1)))
         self._log("sentence_coverage", score)
         return score
 

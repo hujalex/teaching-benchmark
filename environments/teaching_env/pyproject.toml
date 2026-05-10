@@ -6,18 +6,18 @@ version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
     "verifiers>=0.1.12",
-    "sentence-transformers",
+    "fastembed",
+    "optimum[onnxruntime]",
     "scikit-learn",
     "spacy>=3.7.4",
     "nltk",
     "textstat",
     "datasets",
-    "keybert",
     "networkx",
-    "markitdown[pdf]",
+    "markitdown",
     "python-frontmatter",
     "markdown-it-py",
-    "rouge-score>=0.1.2",
+    "rouge-score",
 ]
 
 [build-system]
