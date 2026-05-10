@@ -8,6 +8,12 @@ def _strip_latex(text: str) -> str:
     return text.strip()
 
 
+def _word_boundary_match(pattern: str, text: str) -> bool:
+    """Return True if pattern appears as a whole word (or phrase) in text."""
+    escaped = re.escape(pattern)
+    return bool(re.search(r'(?<!\w)' + escaped + r'(?!\w)', text))
+
+
 def compute(completion: str, kg: dict) -> float:
     concepts = kg.get("concepts", [])
     if not concepts:
@@ -19,10 +25,11 @@ def compute(completion: str, kg: dict) -> float:
         forms = c.get("surface_forms", [c.get("canonical", "")])
         for sf in forms:
             sf_lower = sf.lower()
-            if sf_lower in completion_lower:
+            # Require word-boundary match so "use" doesn't hit "because" or "reuse".
+            if _word_boundary_match(sf_lower, completion_lower):
                 return True
-            # Also match after stripping LaTeX markup from both sides
-            if _strip_latex(sf_lower) in completion_stripped:
+            sf_stripped = _strip_latex(sf_lower)
+            if sf_stripped and _word_boundary_match(sf_stripped, completion_stripped):
                 return True
         return False
 

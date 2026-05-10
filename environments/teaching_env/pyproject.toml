@@ -1,24 +1,22 @@
 [project]
 name = "teaching-env"
-description = "Your environment description here"
-tags = ["placeholder-tag", "train", "eval"]
+description = "Evaluates LLM explanations of textbook excerpts across pedagogy dimensions including concept coverage, coherence, prerequisite ordering, and originality."
+tags = ["single-turn", "teaching", "pedagogy", "nlp", "train", "eval"]
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
     "verifiers>=0.1.12",
-    "numpy<2.0",
-    "sentence-transformers",
+    "fastembed",
     "scikit-learn",
-    "spacy",
-    "en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl",
+    "spacy>=3.7.4",
     "nltk",
     "textstat",
     "datasets",
-    "keybert",
     "networkx",
-    "markitdown[pdf]",
+    "markitdown",
     "python-frontmatter",
     "markdown-it-py",
+    "rouge-score",
 ]
 
 [build-system]
@@ -28,9 +26,12 @@ build-backend = "hatchling.build"
 [tool.hatch.build]
 include = ["teaching_env.py", "parsing.py", "verifier/", "data/", "pyproject.toml"]
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: requires model loading (fastembed + NLI ONNX, ~5 min on first run)",
+]
+
 [tool.verifiers.eval]
 num_examples = 5
 rollouts_per_example = 3
-
-[tool.hatch.metadata]
-allow-direct-references = true

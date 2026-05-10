@@ -7,7 +7,8 @@ _LABEL_SCORES = np.array([0.0, 1.0, 0.5])
 def compute(nli_outputs: np.ndarray) -> float:
     """Score logical flow between consecutive completion sentences.
 
-    nli_outputs: shape (n_consecutive_pairs, n_labels), pre-sliced from the batched call.
+    nli_outputs: shape (n_consecutive_pairs, 3), pre-sliced from the batched call.
+    Returns a value in [0, 1] where 1.0 means every consecutive pair entails.
     """
     if nli_outputs.size == 0:
         return 1.0

@@ -1,0 +1,11 @@
+2026-05-09 21:22:38 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 21:22:58 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 21:22:58 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 21:22:58 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-6ff0b66d8b5f-teaching_env-0
+2026-05-09 21:22:58 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 21:28:37 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 21:30:18 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 21:30:18 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 21:30:18 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-6ff0b66d8b5f-teaching_env-0
+2026-05-09 21:30:18 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 22:11:19 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env

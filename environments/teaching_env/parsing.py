@@ -2,24 +2,25 @@ import json
 import re
 from pathlib import Path
 
-from markitdown import MarkItDown
 from datasets import Dataset, Features, Sequence, Value
 import frontmatter
 from markdown_it import MarkdownIt
-from keybert import KeyBERT
 from verifier.base import clean_source
 
 
 md_parser = MarkdownIt()
 
-_kw_model: KeyBERT | None = None
+_kw_embedder = None
 
 
-def _get_kw_model() -> KeyBERT:
-    global _kw_model
-    if _kw_model is None:
-        _kw_model = KeyBERT()
-    return _kw_model
+def _get_kw_embedder(embedder=None):
+    global _kw_embedder
+    if embedder is not None:
+        return embedder
+    if _kw_embedder is None:
+        from verifier.embedder import Embedder
+        _kw_embedder = Embedder()
+    return _kw_embedder
 
 
 # Patterns: (compiled regex, signal_name, swap_concept_prereq)
@@ -32,20 +33,38 @@ _PREREQ_PATTERNS: list[tuple[re.Pattern, str, bool]] = [
 ]
 
 
-def build_kg(raw_text: str, top_n: int = 12) -> dict:
-    """Extract a knowledge graph from raw markdown text using KeyBERT."""
-    model = _get_kw_model()
-    keywords = model.extract_keywords(
-        raw_text,
-        keyphrase_ngram_range=(1, 2),
-        stop_words="english",
-        top_n=top_n,
-    )
+_CONCEPT_NOISE = re.compile(r'[^a-zA-Z0-9\s\-]')   # non-word chars beyond hyphen
+_MIN_CONCEPT_SIM = 0.25    # drop keywords below this similarity to the document
+_MAX_CONCEPT_LEN = 40      # single-token concepts longer than this are PDF artifacts
+
+
+def _is_valid_concept(kw: str, score: float) -> bool:
+    """Return False for concepts that are likely PDF extraction noise."""
+    if score < _MIN_CONCEPT_SIM:
+        return False
+    tokens = kw.split()
+    for tok in tokens:
+        # Reject tokens that are pure digits or longer than the artifact threshold
+        if tok.isdigit() or len(tok) > _MAX_CONCEPT_LEN:
+            return False
+        # Reject tokens with non-alphanumeric characters beyond hyphens
+        if _CONCEPT_NOISE.search(tok):
+            return False
+    return True
+
+
+def build_kg(raw_text: str, top_n: int = 12, embedder=None) -> dict:
+    """Extract a knowledge graph from raw markdown text."""
+    from verifier.keyword_extractor import extract_keywords
+    emb = _get_kw_embedder(embedder)
+    keywords = extract_keywords(raw_text, emb, top_n=top_n)
 
     concepts = []
     cid_map: dict[str, str] = {}  # canonical_lower -> concept_id
 
-    for kw, _ in keywords:
+    for kw, score in keywords:
+        if not _is_valid_concept(kw, score):
+            continue
         cid = re.sub(r"\s+", "_", kw.strip().lower())
         words = kw.split()
         forms: set[str] = {kw, kw.lower()}
@@ -86,9 +105,13 @@ def convert_pdf_to_markdown(
     source_path = Path(source_pdf)
     output_path = Path(output_markdown)
 
+    if output_path.exists():
+        return output_path
+
     if not source_path.exists():
         raise FileNotFoundError(f"Source file not found: {source_path}")
 
+    from markitdown import MarkItDown
     converter = MarkItDown()
     conversion = converter.convert(str(source_path))
 
@@ -109,7 +132,7 @@ def parse_markdown(filepath: Path) -> dict:
     tokens = md_parser.parse(post.content)
 
     headers = [
-        token.children[0].content
+        next_token.children[0].content
         for token in tokens
         if token.type == "heading_open"
         and (next_token := tokens[tokens.index(token) + 1])
@@ -141,128 +164,61 @@ def parse_markdown(filepath: Path) -> dict:
     }
 
 
+def _subject_label(folder_name: str) -> str:
+    """Normalise a folder name to a subject label (hyphens → underscores)."""
+    return folder_name.replace("-", "_")
+
+
 def create_dataset(
     pdf_dir: str | Path | None = None,
     markdown_dir: str | Path | None = None,
+    embedder=None,
 ) -> Dataset:
     _here = Path(__file__).parent
     pdf_path = Path(pdf_dir) if pdf_dir else _here / "data" / "pdf"
     md_path = Path(markdown_dir) if markdown_dir else _here / "data" / "markdown"
-    # if not pdf_path.exists():
-    #     return Dataset.from_list(
-    #         [
-    #             {
-    #                 "topic": "newton_second_law",
-    #                 "source": "fallback",
-    #                 "page_number": 1,
-    #                 "subject": "physics",
-    #                 "source_file": "fallback",
-    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
-    #                 "headers": ["Newton's second law"],
-    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
-    #                 "num_sections": 1,
-    #                 "question": "Explain Newton's second law to a beginner.",
-    #                 "info": json.dumps(
-    #                     {
-    #                         "topic": "newton_second_law",
-    #                         "kg": {
-    #                             "concepts": [
-    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-    #                                 {
-    #                                     "concept_id": "acceleration",
-    #                                     "canonical": "acceleration",
-    #                                     "surface_forms": ["acceleration", "a"],
-    #                                 },
-    #                             ],
-    #                             "prerequisite_edges": [
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "mass",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "acceleration",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                             ],
-    #                         },
-    #                     }
-    #                 ),
-    #             }
-    #         ]
-    #     )
 
-    pdf_files = sorted(pdf_path.glob("*.pdf"))
-    # if not pdf_files:
-    #     return Dataset.from_list(
-    #         [
-    #             {
-    #                 "topic": "newton_second_law",
-    #                 "source": "fallback",
-    #                 "page_number": 1,
-    #                 "subject": "physics",
-    #                 "source_file": "fallback",
-    #                 "raw_text": "Newton's second law connects force, mass, and acceleration.",
-    #                 "headers": ["Newton's second law"],
-    #                 "sections": ["Force is proportional to acceleration and scales with mass."],
-    #                 "num_sections": 1,
-    #                 "question": "Explain Newton's second law to a beginner.",
-    #                 "info": json.dumps(
-    #                     {
-    #                         "topic": "newton_second_law",
-    #                         "kg": {
-    #                             "concepts": [
-    #                                 {"concept_id": "force", "canonical": "force", "surface_forms": ["force", "F"]},
-    #                                 {"concept_id": "mass", "canonical": "mass", "surface_forms": ["mass", "m"]},
-    #                                 {
-    #                                     "concept_id": "acceleration",
-    #                                     "canonical": "acceleration",
-    #                                     "surface_forms": ["acceleration", "a"],
-    #                                 },
-    #                             ],
-    #                             "prerequisite_edges": [
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "mass",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                                 {
-    #                                     "concept": "force",
-    #                                     "prereq": "acceleration",
-    #                                     "confidence": "high",
-    #                                     "signal": "fallback",
-    #                                 },
-    #                             ],
-    #                         },
-    #                     }
-    #                 ),
-    #             }
-    #         ]
-    #     )
+    # Discover subject subdirectories; fall back to flat root layout.
+    subject_dirs = sorted(d for d in pdf_path.iterdir() if d.is_dir()) if pdf_path.exists() else []
 
-    for pdf_file in pdf_files:
-        output_md = md_path / f"{pdf_file.stem}.md"
-        convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
+    if subject_dirs:
+        # Subject-structured layout: pdf/<subject>/*.pdf → markdown/<subject>/*.md
+        for subject_dir in subject_dirs:
+            subject_md_path = md_path / subject_dir.name
+            for pdf_file in sorted(subject_dir.glob("*.pdf")):
+                output_md = subject_md_path / f"{pdf_file.stem}.md"
+                convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
 
-    files = sorted(md_path.glob("*.md"))
-    if not files:
-        raise ValueError(f"No markdown files found in {md_path}")
+        # Collect (markdown_path, folder_name) pairs from every subject subdir.
+        md_files: list[tuple[Path, str]] = []
+        for subject_dir in subject_dirs:
+            subject_md_path = md_path / subject_dir.name
+            md_files.extend(
+                (f, subject_dir.name) for f in sorted(subject_md_path.glob("*.md"))
+            )
+    else:
+        # Flat legacy layout: pdf/*.pdf → markdown/*.md
+        for pdf_file in sorted(pdf_path.glob("*.pdf")):
+            output_md = md_path / f"{pdf_file.stem}.md"
+            convert_pdf_to_markdown(source_pdf=pdf_file, output_markdown=output_md)
+
+        md_files = [(f, "") for f in sorted(md_path.glob("*.md"))]
+
+    if not md_files:
+        raise ValueError(f"No markdown files found under {md_path}")
 
     records = []
-    for f in files:
+    for f, folder_name in md_files:
         page = parse_markdown(f)
+        # Folder name is the authoritative subject source; frontmatter is the fallback.
+        subject = _subject_label(folder_name) if folder_name else page.get("subject", "")
+        page["subject"] = subject
         cleaned_text = clean_source(page["raw_text"])
-        kg = build_kg(cleaned_text)
+        kg = build_kg(cleaned_text, embedder=embedder)
         records.append({
             **page,
-            # verifiers-framework columns — use cleaned text so metrics see no PDF artifacts
             "question": cleaned_text,
-            "info": json.dumps({"topic": page["topic"], "kg": kg}),
+            "info": json.dumps({"topic": page["topic"], "subject": subject, "kg": kg}),
         })
 
     features = Features({

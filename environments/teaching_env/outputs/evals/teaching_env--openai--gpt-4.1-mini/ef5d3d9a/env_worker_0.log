@@ -1,0 +1,18 @@
+2026-05-09 19:23:27 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 19:23:47 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 19:23:47 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 19:23:47 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-659a3022f5bb-teaching_env-0
+2026-05-09 19:23:47 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 19:25:01 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 19:25:16 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 19:25:16 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 19:25:16 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-659a3022f5bb-teaching_env-0
+2026-05-09 19:25:16 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 19:28:58 - verifiers.utils.env_utils - INFO - Loading environment: teaching_env
+2026-05-09 19:29:10 - verifiers.utils.env_utils - INFO - Successfully loaded environment 'teaching_env'
+2026-05-09 19:29:10 - verifiers.utils.thread_utils - INFO - Scaled default executor and 0 registered executor(s) ()
+2026-05-09 19:29:10 - verifiers.serve.server.env_worker.EnvWorker - INFO - Initialized worker teaching_env-0 on ipc:///tmp/vf-659a3022f5bb-teaching_env-0
+2026-05-09 19:29:10 - verifiers.serve.server.env_worker.EnvWorker - INFO - Starting worker teaching_env-0
+2026-05-09 19:30:20 - verifiers.serve.server.env_worker.EnvWorker - INFO - Cancelling 8 active tasks on worker teaching_env-0
+2026-05-09 19:30:20 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-09 19:30:20 - verifiers.serve.server.env_worker.EnvWorker - INFO - Shut down worker teaching_env-0
