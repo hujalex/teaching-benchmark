@@ -109,7 +109,7 @@ def parse_markdown(filepath: Path) -> dict:
     tokens = md_parser.parse(post.content)
 
     headers = [
-        token.children[0].content
+        next_token.children[0].content
         for token in tokens
         if token.type == "heading_open"
         and (next_token := tokens[tokens.index(token) + 1])

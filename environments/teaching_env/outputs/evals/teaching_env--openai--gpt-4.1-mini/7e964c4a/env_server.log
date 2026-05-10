@@ -61,3 +61,9 @@
 2026-05-09 19:34:36 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 3 (W0: 3)
   Server | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=7ms max=403ms (n=1000)
   W0     | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=48ms max=362ms (n=1000)
+2026-05-09 19:34:46 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 1 (W0: 1)
+  Server | Lag: min=0ms mean=2ms median=1ms p90=1ms p99=7ms max=403ms (n=1000)
+  W0     | Lag: min=0ms mean=3ms median=1ms p90=1ms p99=48ms max=362ms (n=1000)
+2026-05-09 19:34:49 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-09 19:34:51 - verifiers.serve.server.env_router.EnvRouter - INFO - Router shut down
+2026-05-09 19:34:51 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer shut down

@@ -1,0 +1,21 @@
+2026-05-09 21:20:44 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - Initializing ZMQEnvServer to serve teaching_env (env_args={}, extra_env_kwargs={'concurrency': 32}, num_workers=1)
+2026-05-09 21:20:44 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer started on tcp://127.0.0.1:56195
+2026-05-09 21:20:44 - verifiers.serve.server.env_router.EnvRouter - INFO - Started worker (id=0, name=teaching_env-0, address=ipc:///tmp/vf-94cd9ae22c59-teaching_env-0, pid=9206)
+2026-05-09 21:20:54 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: ?)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=100)
+  W0     | no stats yet
+2026-05-09 21:21:04 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: ?)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=200)
+  W0     | no stats yet
+2026-05-09 21:21:15 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 0 (W0: ?)
+  Server | Lag: min=0ms mean=1ms median=1ms p90=1ms p99=1ms max=1ms (n=299)
+  W0     | no stats yet
+2026-05-09 21:21:25 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 30 (W0: 30)
+  Server | Lag: min=0ms mean=12ms median=1ms p90=1ms p99=232ms max=2s (n=358)
+  W0     | Lag: min=0ms mean=4ms median=1ms p90=1ms p99=53ms max=162ms (n=96)
+2026-05-09 21:21:35 - verifiers.serve.server.env_router.EnvRouter - INFO - Active tasks: 30 (W0: 30)
+  Server | Lag: min=0ms mean=19ms median=1ms p90=1ms p99=586ms max=2s (n=423)
+  W0     | Lag: min=0ms mean=55ms median=1ms p90=40ms p99=2s max=2s (n=129)
+2026-05-09 21:21:38 - verifiers.utils.process_utils - INFO - Death pipe closed — parent is gone, sending SIGTERM to self
+2026-05-09 21:21:58 - verifiers.serve.server.env_router.EnvRouter - INFO - Router shut down
+2026-05-09 21:21:58 - verifiers.serve.server.env_server.ZMQEnvServer - INFO - ZMQEnvServer shut down
